@@ -1,4 +1,4 @@
-#! /usr/bin/node
+#! /usr/bin/env node
 // vi:syntax=javascript:
 
 const path = require('path');
