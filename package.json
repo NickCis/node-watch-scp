@@ -10,6 +10,9 @@
   "bin": "./bin/watch-scp",
   "author": "Nicolas Cisco",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "askpassword": "^1.2.4",
     "lodash": "^4.17.21",
