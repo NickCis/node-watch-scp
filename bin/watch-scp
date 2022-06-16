@@ -1,0 +1,49 @@
+#! /usr/bin/node
+// vi:syntax=javascript:
+
+const path = require('path');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+
+const argv = yargs(hideBin(process.argv))
+  .command('$0: <source> <target>', 'Watches folder and copy files over scp')
+  .positional('source', {
+    describe: 'Source folder',
+  })
+  .positional('target', {
+    describe: 'Target folder (scp syntax)',
+  })
+  .option('port', {
+    alias: 'P',
+    type: 'number',
+    description: 'SSH port',
+  })
+  .option('key', {
+    alias: 'k',
+    description: 'SSH key options (will pick the first that exists)',
+    type: 'array',
+    default: [
+      path.join(process.env.HOME, '.ssh/id_ed25519'),
+      path.join(process.env.HOME, '.ssh/id_rsa'),
+    ],
+  })
+  .option('password', {
+    alias: 'p',
+    description: 'Password use `-` for stdin',
+  })
+  .option('cwd', {
+    description: 'Current working directory for shell (remote)',
+  })
+  .option('cmd', {
+    description: 'Run program after change',
+  })
+  .option('wait', {
+    description: 'Debounce running program',
+    type: 'number',
+    default: 2000,
+  })
+  .parse();
+
+import('../src/main.mjs').then(({ default: main }) =>
+  main(argv.source, argv.target, argv),
+);
