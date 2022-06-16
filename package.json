@@ -6,6 +6,7 @@
     "format": "prettier --write '{src}/**/*.{js,ts,tsx,mjs}' bin/watch-scp",
     "format-bin": "prettier --write --parser babel bin/watch-scp"
   },
+  "bin": "./bin/watch-scp",
   "author": "Nicolas Cisco",
   "license": "MIT",
   "dependencies": {
