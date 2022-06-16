@@ -1,9 +1,10 @@
 {
   "name": "watch-scp",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
-    "format": "prettier --write '{src}/**/*.{js,ts,tsx,mjs}' bin/watch-scp",
+    "format": "yarn format-src && yarn format-bin",
+    "format-src": "prettier --write 'src/**/*.{js,ts,tsx,mjs}'",
     "format-bin": "prettier --write --parser babel bin/watch-scp"
   },
   "bin": "./bin/watch-scp",

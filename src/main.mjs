@@ -54,31 +54,34 @@ async function main(from, to, argv) {
       pid = undefined;
     }
 
-    ssh.connection.exec(`echo "EXEC PID: $$"; ${argv.cmd}`, { cwd: config.cwd }, (err, stream) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-
-      stream.on('data', buffer => {
-        const lines = buffer.toString();
-
-        for (const line of lines.split('\n')) {
-          if (line.startsWith('EXEC PID: ')) {
-            pid = line.substr('EXEC PID: '.length)
-            continue;
-          }
-
-          if (line)
-            console.log('[remote]', line);
+    ssh.connection.exec(
+      `echo "EXEC PID: $$"; ${argv.cmd}`,
+      { cwd: config.cwd },
+      (err, stream) => {
+        if (err) {
+          console.error(err);
+          return;
         }
-      })
-      .on('end', () => {
-        pid = undefined;
-      });
-    });
-  }, argv.wait);
 
+        stream
+          .on('data', buffer => {
+            const lines = buffer.toString();
+
+            for (const line of lines.split('\n')) {
+              if (line.startsWith('EXEC PID: ')) {
+                pid = line.substr('EXEC PID: '.length);
+                continue;
+              }
+
+              if (line) console.log('[remote]', line);
+            }
+          })
+          .on('end', () => {
+            pid = undefined;
+          });
+      },
+    );
+  }, argv.wait);
 
   watch(from, { recursive: true }, async (evt, name) => {
     const file = path.resolve(name);
