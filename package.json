@@ -1,5 +1,5 @@
 {
-  "name": "watch-scp",
+  "name": "node-watch-scp",
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
