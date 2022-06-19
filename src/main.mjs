@@ -5,6 +5,7 @@ import watch from 'node-watch';
 import askpassword from 'askpassword';
 import { NodeSSH } from 'node-ssh';
 import debounce from 'lodash/debounce.js';
+import ignore from 'ignore';
 
 async function parseConfig(to, argv = {}) {
   const [ssh, folder] = to.split(':');
@@ -38,8 +39,15 @@ async function parseConfig(to, argv = {}) {
   return config;
 }
 
+async function getIgnore(ignoreFile) {
+  try {
+    await fs.access(ignoreFile, constants.R_OK);
+    return ignore().add((await fs.readFile(ignoreFile)).toString());
+  } catch (e) {}
+}
+
 async function main(from, to, argv) {
-  console.log('[Watching] %s -> %s', from, to);
+  console.log(`[Watching] ${from.join(', ')} -> ${to}`);
 
   const config = await parseConfig(to, argv);
   const ssh = new NodeSSH();
@@ -49,11 +57,11 @@ async function main(from, to, argv) {
   const run = debounce(async () => {
     if (!argv.cmd) return;
     if (pid) {
-      console.log('--- Killing remote ---');
       await ssh.execCommand(`pkill -g ${pid}`);
       pid = undefined;
     }
 
+    console.log('[remote]', argv.cmd);
     ssh.connection.exec(
       `echo "EXEC PID: $$"; ${argv.cmd}`,
       { cwd: config.cwd },
@@ -83,7 +91,20 @@ async function main(from, to, argv) {
     );
   }, argv.wait);
 
-  watch(from, { recursive: true }, async (evt, name) => {
+  const options = {
+    recursive: true,
+  };
+
+  const ignore = getIgnore(argv.ignore);
+  if (ignore) {
+    options.filter = (f, skip) => {
+      const result = ignore.test(f);
+      if (result.ignored) return skip;
+      return true;
+    };
+  }
+
+  watch(from, options, async (evt, name) => {
     const file = path.resolve(name);
     const remoteFile = path.join(config.folder, name);
     console.log('[%s] %s -> %s ', evt, file, remoteFile);

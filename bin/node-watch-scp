@@ -6,9 +6,10 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
 const argv = yargs(hideBin(process.argv))
-  .command('$0: <source> <target>', 'Watches folder and copy files over scp')
+  .command('$0: <target> <source..>', 'Watches folder and copy files over scp')
   .positional('source', {
-    describe: 'Source folder',
+    describe: 'Source folder (can be many)',
+    type: 'array',
   })
   .positional('target', {
     describe: 'Target folder (scp syntax)',
@@ -41,6 +42,10 @@ const argv = yargs(hideBin(process.argv))
     description: 'Debounce running program',
     type: 'number',
     default: 2000,
+  })
+  .option('ignore', {
+    description: 'Git ignore like file',
+    default: path.join(process.cwd(), '.gitignore'),
   })
   .parse();
 
