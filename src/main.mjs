@@ -95,7 +95,7 @@ async function main(from, to, argv) {
     recursive: true,
   };
 
-  const ignore = getIgnore(argv.ignore);
+  const ignore = await getIgnore(argv.ignore);
   if (ignore) {
     options.filter = (f, skip) => {
       const result = ignore.test(f);
