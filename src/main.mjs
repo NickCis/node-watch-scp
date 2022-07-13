@@ -15,6 +15,7 @@ async function parseConfig(to, argv = {}) {
       tryKeyboard: true,
       username: user || 'root',
       host,
+      port: argv.port || 22,
     },
     folder,
     cwd: folder || argv.cwd,
